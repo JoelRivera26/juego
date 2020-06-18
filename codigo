@@ -1,0 +1,969 @@
+TITLE VIDEOJUEGO
+;*****************************************************
+;  PROYECTO TERCER PARCIAL : LENGUAJES DE BAJO NIVEL
+;  DR. EUSEBIO RICARDEZ VAZQUEZ
+;  POR JOEL RIVERA ARREDONDO
+;******************************************************
+INCLUDE Irvine32.inc
+
+.data
+Menu	DB	0C9H, 19 DUP(0CDH), 0Bbh, 0
+Menu0	DB	0Bah, 'BIENVENIDO AL JUEGO', 0Bah, 0
+MENU1	DB	0cch, 19 DUP(0CDH), 0B9h, 0
+Menu2	DB		  '      INICIAR      ', 0
+Menu3	DB	      '       SALIR       ', 0
+Menu4	DB	0C8H, 19 DUP(0CDH), 0BCH, 0
+menu5	DB  0C9H, 28 DUP(0CDH), 0Bbh, 0
+
+nombre byte "TECLEA TU NOMBRE", 0
+izqui  byte "IZQUIERDA", 0
+dere   byte "DERECHA", 0
+jugad  byte "JUGADOR 1:", 0
+espaci byte "(espacio)", 0
+pausa  byte "PAUSA", 0
+score  byte "PUNTUACION: ", 0
+nivel  byte "NIVEL: ", 0
+fin    byte "FIN DEL JUEGO", 0
+puntua dword ?
+aux    byte ?
+aux0   byte 21
+aux1   byte 22
+aux2   byte 3
+conta  dword ?
+cadena byte 50 DUP(?)
+var1   byte ?
+var2   byte ?
+var3   byte ?
+var4   byte ?
+.code
+main PROC
+
+iniciar:
+mov puntua, 0
+mov var1, 14
+mov var2, 15
+mov var3, 16
+mov var4, 17
+
+mov eax, white + (black * 16)		;menu
+call	settextcolor
+mov dl, 20						
+mov dh, 7
+call	gotoxy
+mov edx, offset menu
+call	writestring
+mov dl, 20
+mov dh, 8
+call	gotoxy
+mov edx, offset menu0
+call	writestring
+mov dl, 20
+mov dh, 9
+call	gotoxy
+mov edx, offset menu1
+call	writestring
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 21
+mov dh, 10
+call	gotoxy
+mov edx, offset menu2
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+mov dl, 21
+mov dh, 11
+call	gotoxy
+mov edx, offset menu3
+call	writestring
+mov dl, 20
+mov dh, 12
+call	gotoxy
+mov edx, offset menu4
+call	writestring
+mov dl, 20
+mov dh, 10
+mov ecx,2
+lm:
+	call	gotoxy
+	mov al, 0Bah
+	call	writechar
+	add dl, 20
+	call	gotoxy
+	mov al, 0Bah
+	call	writechar
+	sub dl, 20
+	inc dh
+loop lm
+mov dl, 21
+mov dh, 10
+call	gotoxy
+readkey0:
+	mov  eax, 50
+	call	Delay
+	call	readkey
+	cmp ah, 48h
+	jne sigu
+	jmp salir
+sigu:
+	cmp ah, 50h
+    jne sigu0
+	cmp dx, 0028h
+	jne sigu0
+	jmp salir 
+sigu0:
+	cmp ah, 1ch
+	jne sigu1
+	cmp dx, 000dh
+	jne sigu1
+	call	clrscr
+	jmp juego
+sigu1:
+	jmp readkey0
+
+salir:
+mov dl, 20						;menu
+mov dh, 8
+call	gotoxy
+mov edx, offset menu
+call	writestring
+mov dl, 20
+mov dh, 8
+call	gotoxy
+mov edx, offset menu0
+call	writestring
+mov dl, 20
+mov dh, 9
+call	gotoxy
+mov edx, offset menu1
+call	writestring
+mov dl, 21
+mov dh, 10
+call	gotoxy
+mov edx, offset menu2
+call	writestring
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 21
+mov dh, 11
+call	gotoxy
+mov edx, offset menu3
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+mov dl, 20
+mov dh, 12
+call	gotoxy
+mov edx, offset menu4
+call	writestring
+mov dl, 20
+mov dh, 10
+mov ecx,2
+lm0:
+	call	gotoxy
+	mov al, 0Bah
+	call	writechar
+	add dl, 20
+	call	gotoxy
+	mov al, 0Bah
+	call	writechar
+	sub dl, 20
+	inc dh
+loop lm0
+mov dl, 21
+mov dh, 11
+call	gotoxy
+readkey1:
+	mov  eax, 50
+	call	Delay
+	call	readkey
+	cmp ah, 48h
+	jne sigu2
+	jmp iniciar
+sigu2:
+	cmp ah, 50h
+    jne sigu3
+	cmp dx, 0028h
+	jne sigu3
+	jmp iniciar
+sigu3:
+	cmp ah, 1ch
+	jne sigu4
+	cmp dx, 000dh
+	jne sigu4
+	exit
+sigu4:
+	jmp readkey1
+
+juego:						;estructura del juego
+
+mov dl, 20
+mov dh, 8
+call	gotoxy
+mov edx, offset nombre
+call	writestring
+mov al, 175
+mov dl, 20
+mov dh, 9
+call	gotoxy
+call	writechar
+mov edx, offset cadena
+mov ecx, 17
+call	readstring
+call	clrscr
+
+mov dl, 8
+mov dh, 1
+call	gotoxy
+mov edx, offset score
+call	writestring
+mov eax, puntua
+call	writedec
+
+mov eax, lightgreen + (black * 16)
+call	settextcolor
+mov al, 174
+mov dl, 42
+mov dh, 19
+call	gotoxy
+call	writechar
+
+mov dl, 39
+mov dh, 3
+call	gotoxy
+mov edx, offset jugad
+call	writestring
+mov dl, 39
+mov dh, 5
+call	gotoxy
+mov edx, offset cadena
+call	writestring
+
+mov dl, 38
+mov dh, 20
+call	gotoxy
+mov edx, offset izqui
+call	writestring
+mov al, 175
+mov dl, 42
+mov dh, 16
+call	gotoxy
+call	writechar
+mov dl, 39
+mov dh, 17
+call	gotoxy
+mov edx, offset dere
+call	writestring
+mov dl, 38
+mov dh, 22
+call	gotoxy
+mov edx, offset espaci
+call	writestring
+mov dl, 40
+mov dh, 23
+call	gotoxy
+mov edx, offset pausa
+call	writestring
+
+mov eax, white + (black * 16)
+call	settextcolor
+mov ecx, 2
+mov al, 186
+mov dl, 7
+mov dh, 1
+lp :
+call	gotoxy
+call	writechar
+add dl, 29
+loop lp
+
+mov dl, 7
+mov dh, 0
+call	gotoxy
+mov edx, offset menu5
+call	writestring
+
+mov ecx, 30		;cuadro alrededor del juego (parte superior)
+mov al, 205
+mov dl, 7
+mov dh, 2
+l1:
+cmp dl, 7
+jne salto
+mov aux, al
+mov al, 204
+call	gotoxy
+call	writechar
+mov al, aux
+jmp l9
+salto:
+	cmp dl, 36
+	jne salto1
+	mov aux, al
+	mov al, 185
+	call	gotoxy
+	call	writechar
+	mov al, aux
+	jmp l9
+salto1:
+	call	gotoxy
+	call	writechar
+l9:
+inc dl
+loop l1
+
+mov ecx, 22			;cuadro alrededor del juego (parte lateral izquierda)
+mov al, 186
+mov dl, 7
+mov dh, 3
+l2:
+cmp dh, 24
+jne salto2
+mov aux, al
+mov al, 200
+call	gotoxy
+call	writechar
+mov al, aux
+jmp l8
+salto2:
+call	gotoxy
+call	writechar
+l8:
+inc dh
+loop l2
+
+mov ecx, 29				;cuadro alrededor del juego (parte inferior)
+mov al, 205
+mov dl, 8
+mov dh, 24
+l3:
+cmp dl, 36
+jne salto3
+mov aux, al
+mov al, 188
+call	gotoxy
+call	writechar
+mov al, aux
+jmp l7
+salto3:
+call	gotoxy
+call	writechar
+l7:
+inc dl
+loop l3
+
+mov ecx, 21				;cuadro alrededor del juego (parte lateral derecha)
+mov al, 186
+mov dl, 36
+mov dh, 3
+l4:
+call	gotoxy
+call	writechar
+inc dh
+loop l4
+
+mov  eax, lightblue + (black * 16)			;vehiculo
+call	SetTextColor
+mov al, "]"					
+mov dl, 20
+mov dh, 23
+call	gotoxy
+call	writechar
+
+mov al, 219
+mov dl, 21
+mov dh, 23
+call	gotoxy
+call	writechar
+
+mov al, "["
+mov dl, 22
+mov dh, 23
+call	gotoxy
+call	writechar
+mov conta, 20				
+jmp baja
+baja1:
+mov  eax, black + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+ll:
+	cmp dl, 14
+	je nada0
+	cmp dl, 15
+	je nada0
+	cmp dl, 16
+	je nada0
+	cmp dl, 17
+	je nada0
+	call	gotoxy
+	call	writechar
+nada0:
+	inc aux2	
+	inc dl
+loop ll
+sub aux2, 27
+cmp aux2, 23
+jne sig2
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 14
+mov dh, 11
+call	gotoxy
+mov edx, offset fin
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+mov aux0, 21
+mov aux1, 22
+call	readchar
+call	clrscr
+jmp iniciar
+
+sig2:
+
+cmp aux2, 24
+jne cont
+mov eax, white + (black * 16)
+call	settextcolor
+add puntua, 75
+mov dl, 8
+mov dh, 1
+call	gotoxy
+mov edx, offset score
+call	writestring
+mov eax, puntua
+call	writedec
+
+mov aux2, 3
+cont:
+
+mov conta, 20
+baja:
+mov  eax, lightred + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 219
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+l6:
+	cmp dl, var1
+	je nada
+	cmp dl, var2
+	je nada
+	cmp dl, var3
+	je nada
+	cmp dl, var4
+	je nada
+	call	gotoxy
+	call	writechar
+	inc aux2
+nada:	
+	inc dl
+loop l6 
+sub aux2, 24
+key:
+	mov  eax, 50          
+    ;call	Delay           
+	call	readkey	
+	cmp ah, 4bh
+	jne next
+	cmp dx, 0025h
+	jne next
+	jmp izquierda
+next:
+	cmp ah, 4dh
+	jne next0
+	cmp dx, 0027h
+	jne next0
+	jmp derecha
+next0:
+	cmp ah, 39h
+	jne nexxt
+	call	pausaa
+nexxt:
+dec conta
+cmp conta, 0
+je baja1
+jmp baja
+
+
+izquierda1:
+add aux1, 2
+izquierda:
+mov  eax, black + (black * 16)			
+call	SetTextColor
+mov al, 219
+mov dl, aux1
+mov dh, 23
+call	gotoxy
+call	writechar
+dec aux1
+
+mov  eax, lightblue + (black * 16)		;avanza a la izquierda
+call	SetTextColor
+mov al, "["
+mov dl, aux0
+mov dh, 23
+call	gotoxy
+call	writechar
+
+dec aux0
+mov al, 219
+mov dl, aux0 
+mov dh, 23
+call	gotoxy
+call	writechar
+
+dec aux0
+mov al, "]"
+mov dl, aux0
+mov dh, 23
+call	gotoxy
+call	writechar
+inc aux0
+
+mov conta, 20
+jmp baja4
+baja5:
+mov  eax, black + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+lc:
+	cmp dl, var1
+	je nada1
+	cmp dl, var2
+	je nada1
+	cmp dl, var3
+	je nada1
+	cmp dl, var4
+	je nada1
+	call	gotoxy
+	call	writechar
+nada1:
+	inc aux2	
+	inc dl
+loop lc
+sub aux2, 27
+cmp aux2, 23
+jne sig
+mov al, var2
+cmp aux0, al
+je sig
+mov ah, var3
+cmp aux0, ah
+je sig
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 14
+mov dh, 11
+call	gotoxy
+mov edx, offset fin
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+mov aux0, 21
+mov aux1, 22
+call	readchar
+
+call	clrscr
+jmp iniciar
+
+
+sig:
+cmp aux2, 24
+jne cont0
+mov eax, white + (black * 16)
+call	settextcolor
+add puntua, 75
+mov dl, 8
+mov dh, 1
+call	gotoxy
+mov edx, offset score
+call	writestring
+mov eax, puntua
+call	writedec
+
+rand0 :
+call	randomize
+mov eax, 32
+call	randomrange
+inc eax
+cmp eax, 8
+jb rand0
+mov var1, al
+inc eax
+mov var2, al
+inc eax
+mov var3, al
+inc eax
+mov var4, al
+mov aux2, 3
+cont0:
+mov conta, 20
+baja4:
+mov  eax, lightred + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 219
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+ld:
+	cmp dl, var1
+	je nadab
+	cmp dl, var2
+	je nadab
+	cmp dl, var3
+	je nadab
+	cmp dl, var4
+	je nadab
+	call	gotoxy
+	call	writechar
+	inc aux2
+nadab:	
+	inc dl
+loop ld 
+sub aux2, 24
+
+key0:
+	mov  eax, 50          
+    ;call	Delay           
+	call	readkey
+	cmp aux0, 9 
+	je next1
+	cmp ah, 4bh
+	jne next1
+	cmp dx, 0025h
+	jne next1
+	jmp izquierda
+next1:
+	cmp ah, 4dh
+	jne next2
+	cmp dx, 0027h
+	jne next2
+	jmp derecha
+next2:
+	cmp ah, 39h
+	jne nexxt0
+	call	pausaa
+nexxt0:
+dec conta
+cmp conta, 0
+je baja5
+jmp baja4
+
+
+derecha:
+sub aux1, 2
+derecha1:
+mov  eax, black + (black * 16)			
+call	SetTextColor
+mov al, 219
+mov dl, aux1
+mov dh, 23
+call	gotoxy
+call	writechar
+inc aux1
+
+mov  eax, lightblue + (black * 16)		;avanza a la derecha
+call	SetTextColor
+mov al, "]"
+mov dl, aux0
+mov dh, 23
+call	gotoxy
+call	writechar
+
+inc aux0
+mov al, 219
+mov dl, aux0 
+mov dh, 23
+call	gotoxy
+call	writechar
+
+inc aux0
+mov al, "["
+mov dl, aux0
+mov dh, 23
+call	gotoxy
+call	writechar
+dec aux0
+
+mov conta, 20
+jmp baja2
+baja3:
+mov  eax, black + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+la:
+	cmp dl, var1
+	je nada2
+	cmp dl, var2
+	je nada2
+	cmp dl, var3
+	je nada2
+	cmp dl, var4
+	je nada2
+	call	gotoxy
+	call	writechar
+nada2:	
+	inc aux2	
+	inc dl
+loop la
+sub aux2, 27
+cmp aux2, 23
+jne sig1
+mov bl, var2
+cmp aux0, bl
+je sig1
+mov bh, var3
+cmp aux0, bh
+je sig1
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 14
+mov dh, 11
+call	gotoxy
+mov edx, offset fin
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+mov aux0, 21
+mov aux1, 22
+call	readchar
+call	clrscr
+jmp iniciar
+
+
+sig1:
+
+cmp aux2, 24
+jne cont1
+mov eax, white + (black * 16)
+call	settextcolor
+add puntua, 75
+mov dl, 8
+mov dh, 1
+call	gotoxy
+mov edx, offset score
+call	writestring
+mov eax, puntua
+call	writedec
+
+rand1:
+call	randomize
+mov eax, 32
+call	randomrange
+inc eax
+cmp eax, 8
+jb rand1
+mov var1, al
+inc eax
+mov var2, al
+inc eax
+mov var3, al
+inc eax
+mov var4, al
+
+mov aux2, 3
+cont1:
+mov conta, 20
+baja2:
+mov  eax, lightred + (black * 16)			;barra 1
+call	SetTextColor
+mov al, 219
+mov dl, 8
+mov dh, aux2
+mov ecx, 28
+lb:
+	cmp dl, var1
+	je nadaa
+	cmp dl, var2
+	je nadaa
+	cmp dl, var3
+	je nadaa
+	cmp dl, var4
+	je nadaa
+	call	gotoxy
+	call	writechar
+	inc aux2
+nadaa:	
+	inc dl
+loop lb 
+sub aux2, 24
+
+key1:
+	mov  eax, 50          
+    ;call	Delay           
+	call	readkey
+	cmp aux0, 34
+	je next3
+	cmp ah, 4dh
+	jne next3
+	cmp dx, 0027h
+	jne next3
+	jmp derecha1
+next3:
+	cmp ah, 4bh
+	jne next4
+	cmp dx, 0025h
+	jne next4
+	jmp izquierda1
+next4:
+	cmp ah, 39h
+	jne nexxt1
+	call	pausaa
+nexxt1:
+dec conta
+cmp conta, 0
+je baja3
+jmp baja2
+
+
+
+
+mov  eax, blue + (black * 16)		;barra 2
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, 9
+mov ecx, 28
+l10:
+	push ecx
+	mov ecx, 2
+	cmp dl, 19
+	je nada4
+	cmp dl, 20
+	je nada4
+	cmp dl, 21
+	je nada4
+	cmp dl, 22
+	je nada1
+	l11:
+		call	gotoxy
+		call	writechar
+		inc dh
+	loop l11
+nada4:	
+	mov dh, 9
+	inc dl
+	pop ecx
+loop l10
+
+mov  eax, blue + (black * 16)			;barra 3
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, 13
+mov ecx, 28
+l12:
+	push ecx
+	mov ecx, 2
+	cmp dl, 14
+	je nada5
+	cmp dl, 15
+	je nada5
+	cmp dl, 16
+	je nada5
+	cmp dl, 17
+	je nada5
+	l13:
+		call	gotoxy
+		call	writechar
+		inc dh
+	loop l13
+nada5:	
+	mov dh, 13
+	inc dl
+	pop ecx
+loop l12
+
+mov  eax, blue + (black * 16)		;barra 4
+call	SetTextColor
+mov al, 176
+mov dl, 8
+mov dh, 17
+mov ecx, 28
+l14:
+	push ecx
+	mov ecx, 2
+	cmp dl, 19
+	je nada3
+	cmp dl, 20
+	je nada3
+	cmp dl, 21
+	je nada3
+	cmp dl, 22
+	je nada3
+	l15:
+		call	gotoxy
+		call	writechar
+		inc dh
+	loop l15
+nada3:	
+	mov dh, 17
+	inc dl
+	pop ecx
+loop l14
+
+call	waitmsg
+exit
+main ENDP
+;**************************************************************************************
+vehiculo PROC
+;**************************************************************************************
+mov  eax, lightblue + (black * 16)			;vehiculo alrededor del menu
+call	SetTextColor
+mov al, "]"					
+mov dl, 16
+mov dh, 5
+call	gotoxy
+call	writechar
+
+mov al, 219
+mov dl, 17
+mov dh, 5
+call	gotoxy
+call	writechar
+
+mov al, "["
+mov dl, 18
+mov dh, 5
+call	gotoxy
+call	writechar
+
+ret
+vehiculo ENDP
+;**************************************************************************************
+pausaa PROC
+;pausa el juego
+;**************************************************************************************
+mov eax, yellow + (blue * 16)
+call	settextcolor
+mov dl, 19
+mov dh, 11
+call	gotoxy
+mov edx, offset pausa
+call	writestring
+call	readchar
+mov eax, black + (black * 16)
+call	settextcolor
+mov dl, 19
+mov dh, 11
+call	gotoxy
+mov edx, offset pausa
+call	writestring
+mov eax, white + (black * 16)
+call	settextcolor
+
+ret
+pausaa ENDP
+END main
